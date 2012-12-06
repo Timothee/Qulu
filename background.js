@@ -50,7 +50,7 @@ function scrapePage(xhr) {
 
 		} else {
 			chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
-			chrome.browserAction.setBadgeText({text: "0"});
+			chrome.browserAction.setBadgeText({text: ""});
 			chrome.browserAction.setTitle({title: "Empty queue"});
 			localStorage["Qulu:queueLength"] = 0;
 		}

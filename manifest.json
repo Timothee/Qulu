@@ -12,8 +12,11 @@
 		"scripts": ["background.js"]
 	},
 	"browser_action": {
-		"default_title": "Your Hulu Queue",
-		"default_icon": "images/logo_48x48.png"
+		"default_title": "Qulu - Your Hulu Queue",
+		"default_icon": {
+			"19": "images/logo_gray_38x38.png",
+			"38": "images/logo_gray_38x38.png"
+		}
 	},
 	"permissions": [
 		"*://*.hulu.com/*",
