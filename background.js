@@ -60,7 +60,7 @@ function scrapePage(xhr) {
 			console.log(stored_shows);
 
 			var number = (shows.length >= 25 ? "25+" : shows.length.toString());
-			chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 128]});
+			chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 255]});
 			chrome.browserAction.setBadgeText({text: number});
 			chrome.browserAction.setTitle({title: number + " video" + (number != 1 ? "s" : "") + " in your queue"});
 			localStorage["Qulu:queueLength"] = number;
