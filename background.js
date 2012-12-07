@@ -9,11 +9,11 @@
 // 		change badge to "?"
 // 		change popup to error message
 
-var QUEUE_URL = "http://www.hulu.com/profile/queue";
+var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var click_destination_url = QUEUE_URL;
 
-setInterval(checkQueue, 30000);
+setInterval(checkQueue, 10000);
 
 function checkQueue() {
 	var xhr = new XMLHttpRequest();
@@ -42,9 +42,26 @@ function scrapePage(xhr) {
 		if (queue = doc.getElementById('queue')) {
 			console.log(queue);
 			var shows = queue.getElementsByClassName('r');
-			var number = shows.length;
-			chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 255]});
-			chrome.browserAction.setBadgeText({text: number.toString()});
+
+			// parsing the shows and saving in localStorage
+			var show, id, thumbnail_url, show_title, episode_title;
+			var stored_shows = [];
+			for (var i = 0; i < shows.length; i++) {
+				show = shows[i];
+				id = show.id.substring(7);
+				thumbnail_url = show.getElementsByClassName('thumbnail')[0].src;
+				thumbnail_url = thumbnail_url.replace("145x80", "290x160");
+				show_title = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].firstChild.innerHTML;
+				stored_shows.push({id: id, thumbnail_url: thumbnail_url, title: show_title});
+			}
+			localStorage["Qulu:shows"] = JSON.stringify(stored_shows);
+
+			console.log(shows);
+			console.log(stored_shows);
+
+			var number = (shows.length >= 25 ? "25+" : shows.length.toString());
+			chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 128]});
+			chrome.browserAction.setBadgeText({text: number});
 			chrome.browserAction.setTitle({title: number + " video" + (number != 1 ? "s" : "") + " in your queue"});
 			localStorage["Qulu:queueLength"] = number;
 
@@ -56,11 +73,5 @@ function scrapePage(xhr) {
 		}
 	}
 }
-
-chrome.browserAction.onClicked.addListener( function(tab) {
-	if (tab.url != click_destination_url) {
-		chrome.tabs.create({url: click_destination_url});
-	}
-});
 
 checkQueue()

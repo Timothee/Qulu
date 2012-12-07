@@ -1,0 +1,50 @@
+body {
+	background-color: #333;
+	border: 1px red;
+	margin: 0px;
+	padding: 0px;
+	font-family: "Flama";
+	border-radius: 20px;
+}
+
+
+#list.empty {
+	font-size: 45pt;
+	margin: 20px auto;
+	text-align: center;
+}
+
+#list ul {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+}
+#list ul li {
+	cursor: pointer;
+	height: 135px;
+	position: relative;
+	overflow: hidden;
+}
+#list ul li a img {
+	opacity: 0.4;
+	-webkit-transition-property: opacity;
+	-webkit-transition-duration: 0.3s;
+}
+#list ul li:hover a img {
+	opacity: 0.7;
+	-webkit-transition-property: opacity;
+	-webkit-transition-duration: 0.3s;
+}
+#list ul li a span {
+	color: white;
+	font-size: 20px;
+	text-shadow: 0px 1px 2px black;
+	position: absolute;
+	bottom: 5px;
+	left: 5px;
+	padding: 4px;
+	font-weight: 100;
+}
+#list ul li a span b {
+	font-weight: 500;
+}
