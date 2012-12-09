@@ -51,7 +51,8 @@ function scrapePage(xhr) {
 				id = show.id.substring(7);
 				thumbnail_url = show.getElementsByClassName('thumbnail')[0].src;
 				thumbnail_url = thumbnail_url.replace("145x80", "290x160");
-				show_title = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].firstChild.innerHTML;
+				var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
+				show_title = (title_divs[0].href == "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
 				stored_shows.push({id: id, thumbnail_url: thumbnail_url, title: show_title});
 			}
 			localStorage["Qulu:shows"] = JSON.stringify(stored_shows);
