@@ -75,4 +75,13 @@ function scrapePage(xhr) {
 	}
 }
 
+chrome.extension.onMessage.addListener(
+	function(request, sender, sendResponse) {
+		console.log('received message');
+		if (request.mixpanel) {
+			request.event_properties = request.event_properties || {};
+			console.log('sending event to Mixpanel:' + request.mixpanel + request.event_properties);
+			mixpanel.track(request.mixpanel, request.event_properties);
+		}
+});
 checkQueue()

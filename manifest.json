@@ -9,7 +9,7 @@
 	},
 
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["mixpanel.js", "background.js"]
 	},
 	"browser_action": {
 		"default_title": "Qulu - Your Hulu Queue",
@@ -21,5 +21,6 @@
 	},
 	"permissions": [
 		"*://*.hulu.com/*"
-	]
+	],
+	"content_security_policy": "script-src 'self' https://cdn.mxpnl.com; object-src 'self'"
 }
