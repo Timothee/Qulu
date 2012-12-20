@@ -42,7 +42,7 @@ function scrapePage(xhr) {
 		if (queue = doc.getElementById('queue')) {
 			console.log(queue);
 
-			var previous_shows = JSON.parse(localStorage["Qulu:shows"]);
+			var previous_shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
 			var show_ids = [];
 			for (var i = 0; i < previous_shows.length; i++) {
 				if (previous_shows[i].seen == "yes") {
