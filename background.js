@@ -41,33 +41,51 @@ function scrapePage(xhr) {
 		localStorage["Qulu:loggedIn"] = true;
 		if (queue = doc.getElementById('queue')) {
 			console.log(queue);
-			var shows = queue.getElementsByClassName('r');
+
+			var previous_shows = JSON.parse(localStorage["Qulu:shows"]);
+			var show_ids = [];
+			for (var i = 0; i < previous_shows.length; i++) {
+				if (previous_shows[i].seen == "yes") {
+					show_ids.push(previous_shows[i].id);
+				}
+			}
 
 			// parsing the shows and saving in localStorage
+			var shows = queue.getElementsByClassName('r');
 			var show, id, thumbnail_url, show_title, episode_title;
 			var stored_shows = [];
+			var new_shows_number = 0;
+
 			for (var i = 0; i < shows.length; i++) {
+				var new_show = {};
 				show = shows[i];
-				id = show.id.substring(7);
-				thumbnail_url = show.getElementsByClassName('thumbnail')[0].src;
-				thumbnail_url = thumbnail_url.replace("145x80", "290x160");
+				new_show.id = show.id.substring(7);
+				if (show_ids.indexOf(new_show.id) == -1) {
+					new_shows_number++;
+					new_show.seen = "no";
+				} else {
+					new_show.seen = "yes";
+				}
+				new_show.thumbnail_url = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "290x160");
 				var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
-				show_title = (title_divs[0].href == "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
-				stored_shows.push({id: id, thumbnail_url: thumbnail_url, title: show_title});
+				new_show.title = (title_divs[0].href == "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
+				stored_shows.push(new_show);
 			}
 			localStorage["Qulu:shows"] = JSON.stringify(stored_shows);
 
-			console.log(shows);
-			console.log(stored_shows);
-
 			var number = (shows.length >= 25 ? "25+" : shows.length.toString());
-			chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 255]});
-			chrome.browserAction.setBadgeText({text: number});
+			if (new_shows_number) {
+				chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 255]}); // green
+				chrome.browserAction.setBadgeText({text: "+" + new_shows_number});
+			} else {
+				chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
+				chrome.browserAction.setBadgeText({text: number});
+			}
+
 			chrome.browserAction.setTitle({title: number + " video" + (number != 1 ? "s" : "") + " in your queue"});
 			localStorage["Qulu:queueLength"] = number;
-
 		} else {
-			chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
+			chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
 			chrome.browserAction.setBadgeText({text: ""});
 			chrome.browserAction.setTitle({title: "Empty queue"});
 			localStorage["Qulu:queueLength"] = 0;
@@ -84,4 +102,4 @@ chrome.extension.onMessage.addListener(
 			mixpanel.track(request.mixpanel, request.event_properties);
 		}
 });
-checkQueue()
+checkQueue();

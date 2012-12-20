@@ -10,9 +10,22 @@ window.onload = function () {
 		queue.className = "loggedout";
 	} else {
 		if (parseInt(localStorage["Qulu:queueLength"])) {
-			container.className = "queue";
+			// resetting "seen" state on all the shows
 			var shows = JSON.parse(localStorage["Qulu:shows"]);
+			chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
+			for (var i = 0; i < shows.length; i++) {
+				console.log('changing seen');
+				shows[i].seen = "yes";
+			}
+			console.log(shows);
+			localStorage["Qulu:shows"] = JSON.stringify(shows);
+
+			var number = (shows.length >= 25 ? "25+" : shows.length.toString());
+			chrome.browserAction.setBadgeText({text: number});
+
+			container.className = "queue";
 			var list = document.createElement('ul');
+
 			for (var i = 0; i < shows.length; i++) {
 				var new_item = document.createElement('li');
 				new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + shows[i].id + "' target='_BLANK'>" +
@@ -39,4 +52,4 @@ window.onload = function () {
 		}
 	}
 };
-mixpanel.track('open popup');
+chrome.extension.sendMessage({mixpanel: "open popup"});
