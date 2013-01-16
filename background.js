@@ -1,16 +1,7 @@
-// start interval of 5 minutes or so to check hulu.com/profile/queue
-// and scrape it to know what is in the queue
-// if something
-// 		change badge with correct number
-// 		save list in localStorage or something
-// if nothing
-// 		change badge
-// if not logged in
-// 		change badge to "?"
-// 		change popup to error message
 
 var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
+var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
 var click_destination_url = QUEUE_URL;
 
 setInterval(checkQueue, 10000);
@@ -22,6 +13,20 @@ function checkQueue() {
 	xhr.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			scrapePage(this);
+		}
+	};
+	xhr.send();
+}
+
+function deleteShow(showId) {
+	chrome.browserAction.getBadgeText({}, function(string) {
+		var count = parseInt(string) - 1;
+		chrome.browserAction.setBadgeText({text: (count ? count.toString() : "")})});
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", DELETE_URL + showId);
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			console.log("show " + showId + " deleted");
 		}
 	};
 	xhr.send();
@@ -100,6 +105,11 @@ chrome.extension.onMessage.addListener(
 			request.event_properties = request.event_properties || {};
 			console.log('sending event to Mixpanel:' + request.mixpanel + request.event_properties);
 			mixpanel.track(request.mixpanel, request.event_properties);
+		} else if (request.deleteShow) {
+			console.log("delete show " + request.deleteShow);
+			mixpanel.track("delete show");
+			deleteShow(request.deleteShow);
+
 		}
 });
 checkQueue();

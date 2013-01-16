@@ -31,15 +31,21 @@ window.onload = function () {
 				new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + shows[i].id + "' target='_BLANK'>" +
 					"<img class='thumbnail' src='" + shows[i]["thumbnail_url"] + "'/>" +
 					"<img class='play' src='images/play.png'/>" +
-					"<span>" + shows[i]["title"] +
-					"</a>";
+					"<span>" + shows[i]["title"] + "</span>" +
+					"</a>" +
+					"<img class='delete' alt='Remove from queue' title='Remove from queue' src='images/delete.png'/>";
 				(function(show) {
-					new_item.addEventListener('click', function(e) {
+					(new_item.getElementsByTagName('a')[0]).addEventListener('click', function(e) {
 						console.log(show);
 						chrome.extension.sendMessage({mixpanel: "click video", event_properties: {
 							queue_length: shows.length,
 							show_id: show.id
 						}});
+					});
+					(new_item.getElementsByClassName('delete')[0]).addEventListener('click', function(e) {
+						console.log("deleting show");
+						chrome.extension.sendMessage({deleteShow: show.id});
+						this.parentElement.className = "deleted";
 					});
 				})(shows[i]);
 				list.appendChild(new_item);
