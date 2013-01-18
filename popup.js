@@ -28,6 +28,7 @@ window.onload = function () {
 
 			for (var i = 0; i < shows.length; i++) {
 				var new_item = document.createElement('li');
+				new_item.className = "show";
 				new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + shows[i].id + "' target='_BLANK'>" +
 					"<img class='thumbnail' src='" + shows[i]["thumbnail_url"] + "'/>" +
 					"<img class='play' src='images/play.png'/>" +
@@ -45,7 +46,14 @@ window.onload = function () {
 					(new_item.getElementsByClassName('delete')[0]).addEventListener('click', function(e) {
 						console.log("deleting show");
 						chrome.extension.sendMessage({deleteShow: show.id});
-						this.parentElement.className = "deleted";
+						var show_li = this.parentElement;
+						show_li.className = "show deleted";
+						setTimeout(function() {
+							show_li.parentElement.removeChild(show_li);
+							if (queue.getElementsByClassName('show').length == 0) {
+								container.className = "empty_queue";
+							}
+						}, 500);
 					});
 				})(shows[i]);
 				list.appendChild(new_item);
