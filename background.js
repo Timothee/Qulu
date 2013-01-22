@@ -1,5 +1,5 @@
 
-var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list";
+var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list&order=desc&sort=position";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
 var click_destination_url = QUEUE_URL;
