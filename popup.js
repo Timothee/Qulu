@@ -1,3 +1,15 @@
+// resetting "seen" state on all the shows
+function resetSeenState(shows) {
+	var shows = JSON.parse(localStorage["Qulu:shows"]);
+	chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
+	for (var i = 0; i < shows.length; i++) {
+		console.log('changing seen');
+		shows[i].seen = "yes";
+	}
+	console.log(shows);
+	localStorage["Qulu:shows"] = JSON.stringify(shows);
+}
+
 window.onload = function () {
 	var container = document.getElementById("container");
 	var logged_out = document.getElementById("logged_out");
@@ -10,16 +22,7 @@ window.onload = function () {
 		queue.className = "loggedout";
 	} else {
 		if (parseInt(localStorage["Qulu:queueLength"])) {
-			// resetting "seen" state on all the shows
 			var shows = JSON.parse(localStorage["Qulu:shows"]);
-			chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
-			for (var i = 0; i < shows.length; i++) {
-				console.log('changing seen');
-				shows[i].seen = "yes";
-			}
-			console.log(shows);
-			localStorage["Qulu:shows"] = JSON.stringify(shows);
-
 			var number = (shows.length >= 25 ? "25+" : shows.length.toString());
 			chrome.browserAction.setBadgeText({text: number});
 
@@ -28,13 +31,14 @@ window.onload = function () {
 
 			for (var i = 0; i < shows.length; i++) {
 				var new_item = document.createElement('li');
-				new_item.className = "show";
+				new_item.className = "show" + (shows[i]["seen"] == "yes" ? "" : " new");
 				new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + shows[i].id + "' target='_BLANK'>" +
 					"<img class='thumbnail' src='" + shows[i]["thumbnail_url"] + "'/>" +
 					"<img class='play' src='images/play.png'/>" +
 					"<span>" + shows[i]["title"] + "</span>" +
 					"</a>" +
-					"<img class='delete' alt='Remove from queue' title='Remove from queue' src='images/delete.png'/>";
+					"<img class='delete' alt='Remove from queue' title='Remove from queue' src='images/delete.png'/>" +
+					"<img class='new' alt='New video' title='New video' src='images/pale_blue_dot.png'/>";
 				(function(show) {
 					(new_item.getElementsByTagName('a')[0]).addEventListener('click', function(e) {
 						console.log(show);
@@ -61,6 +65,7 @@ window.onload = function () {
 			queue.innerHTML = "";
 			queue.appendChild(list);
 			console.log(shows);
+			resetSeenState();
 		} else {
 			container.className = "empty_queue";
 		}
