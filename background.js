@@ -103,7 +103,7 @@ chrome.extension.onMessage.addListener(
 		console.log('received message');
 		if (request.mixpanel) {
 			request.event_properties = request.event_properties || {};
-			console.log('sending event to Mixpanel:' + request.mixpanel + request.event_properties);
+			console.log('sending event to Mixpanel:' + request.mixpanel, request.event_properties);
 			mixpanel.track(request.mixpanel, request.event_properties);
 		} else if (request.deleteShow) {
 			console.log("delete show " + request.deleteShow);

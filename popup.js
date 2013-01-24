@@ -39,12 +39,13 @@ window.onload = function () {
 					"</a>" +
 					"<img class='delete' alt='Remove from queue' title='Remove from queue' src='images/delete.png'/>" +
 					"<img class='new' alt='New video' title='New video' src='images/pale_blue_dot.png'/>";
-				(function(show) {
+				(function(show, position_in_queue) {
 					(new_item.getElementsByTagName('a')[0]).addEventListener('click', function(e) {
 						console.log(show);
 						chrome.extension.sendMessage({mixpanel: "click video", event_properties: {
 							queue_length: shows.length,
-							show_id: show.id
+							show_id: show.id,
+							position: position_in_queue
 						}});
 					});
 					(new_item.getElementsByClassName('delete')[0]).addEventListener('click', function(e) {
@@ -59,7 +60,7 @@ window.onload = function () {
 							}
 						}, 500);
 					});
-				})(shows[i]);
+				})(shows[i], i);
 				list.appendChild(new_item);
 			}
 			queue.innerHTML = "";
