@@ -45,7 +45,8 @@ window.onload = function () {
 						chrome.extension.sendMessage({mixpanel: "click video", event_properties: {
 							queue_length: shows.length,
 							show_id: show.id,
-							position: position_in_queue
+							position: position_in_queue,
+							new: (show["seen"] != "yes")
 						}});
 					});
 					(new_item.getElementsByClassName('delete')[0]).addEventListener('click', function(e) {
