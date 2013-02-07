@@ -42,9 +42,12 @@ window.onload = function () {
 				(function(show, position_in_queue) {
 					(new_item.getElementsByTagName('a')[0]).addEventListener('click', function(e) {
 						console.log(show);
+						var decomposed_title = /<b>(.*)<\/b>/.exec(show.title);
+						var title = decomposed_title ? decomposed_title[1] : show.title;
 						chrome.extension.sendMessage({mixpanel: "click video", event_properties: {
-							queue_length: shows.length,
 							show_id: show.id,
+							show_name: title,
+							queue_length: shows.length,
 							position: position_in_queue,
 							new: (show["seen"] != "yes")
 						}});
