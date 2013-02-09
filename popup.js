@@ -1,3 +1,26 @@
+$(function() {
+
+	var Show = Backbone.Model.extend({
+
+	});
+
+	var Queue = Backbone.Collection.extend({
+		model: Show
+	});
+
+	var QueueView = Backbone.View.extend({
+
+	});
+
+	var AppView = Backbone.View.extend({
+		el: $("container")
+	});
+
+	var app = new AppView;
+});
+
+
+
 // resetting "seen" state on all the shows
 function resetSeenState(shows) {
 	var shows = JSON.parse(localStorage["Qulu:shows"]);
