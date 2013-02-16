@@ -5,6 +5,7 @@ $(function() {
 	});
 
 	var Queue = Backbone.Collection.extend({
+		localStorage: new Backbone.LocalStorage('HuluShows'),
 		model: Show
 	});
 
