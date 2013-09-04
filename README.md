@@ -10,3 +10,7 @@ It's available in the [Chrome Web Store](https://chrome.google.com/webstore/deta
 Code provided under the MIT License.
 
 (c) 2013 Timothée Boucher
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/Timothee/qulu/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
