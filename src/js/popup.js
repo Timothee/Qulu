@@ -34,11 +34,11 @@ window.onload = function () {
 				new_item.className = "show" + (shows[i]["seen"] == "yes" ? "" : " new");
 				new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + shows[i].id + "' target='_BLANK'>" +
 					"<img class='thumbnail' src='" + shows[i]["thumbnail_url"] + "'/>" +
-					"<img class='play' src='images/play.png'/>" +
+					"<img class='play' src='../images/play.png'/>" +
 					"<span>" + shows[i]["title"] + "</span>" +
 					"</a>" +
-					"<img class='delete' alt='Remove from queue' title='Remove from queue' src='images/delete.png'/>" +
-					"<img class='new' alt='New video' title='New video' src='images/pale_blue_dot.png'/>";
+					"<img class='delete' alt='Remove from queue' title='Remove from queue' src='../images/delete.png'/>" +
+					"<img class='new' alt='New video' title='New video' src='../images/pale_blue_dot.png'/>";
 				(function(show, position_in_queue) {
 					(new_item.getElementsByTagName('a')[0]).addEventListener('click', function(e) {
 						console.log(show);
