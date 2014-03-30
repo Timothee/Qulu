@@ -11,7 +11,7 @@ function checkQueue() {
     xhr.open("GET", QUEUE_URL);
     xhr.responseType = "document";
     xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             scrapePage(this);
         }
     };
@@ -25,7 +25,7 @@ function deleteShow(showId) {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", DELETE_URL + showId);
     xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             console.log("show " + showId + " deleted");
         }
     };
@@ -35,7 +35,7 @@ function deleteShow(showId) {
 function scrapePage(xhr) {
     var doc = xhr.response, queue;
     // The XHR was redirected to the login page, thus we're logged out
-    if (doc.title == "Hulu - Account") {
+    if (doc.title === "Hulu - Account") {
         click_destination_url = LOGIN_URL;
         localStorage["Qulu:loggedIn"] = false;
         chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
@@ -50,7 +50,7 @@ function scrapePage(xhr) {
             var previous_shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
             var show_ids = [];
             for (var i = 0; i < previous_shows.length; i++) {
-                if (previous_shows[i].seen == "yes") {
+                if (previous_shows[i].seen === "yes") {
                     show_ids.push(previous_shows[i].id);
                 }
             }
@@ -65,7 +65,7 @@ function scrapePage(xhr) {
                 var new_show = {};
                 show = shows[i];
                 new_show.id = show.id.substring(7);
-                if (show_ids.indexOf(new_show.id) == -1) {
+                if (show_ids.indexOf(new_show.id) === -1) {
                     new_shows_number++;
                     new_show.seen = "no";
                 } else {
@@ -73,7 +73,7 @@ function scrapePage(xhr) {
                 }
                 new_show.thumbnail_url = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "290x160");
                 var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
-                new_show.title = (title_divs[0].href == "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
+                new_show.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
                 stored_shows.push(new_show);
             }
             localStorage["Qulu:shows"] = JSON.stringify(stored_shows);
