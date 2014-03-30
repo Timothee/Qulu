@@ -1,10 +1,10 @@
 body {
-	background-color: #3c3c3c;
-	border: 1px red;
-	margin: 0px;
-	padding: 0px;
-	font-family: "Flama";
-	border-radius: 20px;
+    background-color: #3c3c3c;
+    border: 1px red;
+    margin: 0px;
+    padding: 0px;
+    font-family: "Flama";
+    border-radius: 20px;
 }
 
 #logged_out, #empty_queue, #queue { display: none; }
@@ -13,63 +13,63 @@ body {
 #container.queue #queue {display: block; }
 
 #container {
-	width: 290px;
-	min-height: 135px;
-	font-size: 18pt;
+    width: 290px;
+    min-height: 135px;
+    font-size: 18pt;
 }
 
 #logged_out, #empty_queue {
-	text-align: center;
-	background: #3c3c3c;
-	padding: 30px;
-	color: #E6E6E6;
-	text-shadow: rgba(0, 0, 0, 0.75) 0px 1px;
-	font-weight: 300;
+    text-align: center;
+    background: #3c3c3c;
+    padding: 30px;
+    color: #E6E6E6;
+    text-shadow: rgba(0, 0, 0, 0.75) 0px 1px;
+    font-weight: 300;
 }
 
 #logged_out div a, #empty_queue div a {
-	text-decoration: none;
-	margin-top: 10px;
+    text-decoration: none;
+    margin-top: 10px;
 }
 
 #queue ul {
-	margin: 0px;
-	padding: 0px;
-	list-style: none;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
 }
 #queue ul li {
-	cursor: pointer;
-	height: 135px;
-	position: relative;
-	overflow: hidden;
+    cursor: pointer;
+    height: 135px;
+    position: relative;
+    overflow: hidden;
 }
 #queue ul li.deleted {
-	height: 0px;
-	z-index: 1;
-	box-shadow: inset 0px 0px 50px 50px black;
-	-webkit-transition: height 0.35s ease-out;
+    height: 0px;
+    z-index: 1;
+    box-shadow: inset 0px 0px 50px 50px black;
+    -webkit-transition: height 0.35s ease-out;
 }
 #queue ul li a img.thumbnail {
-	z-index: 1;
-	opacity: 0.60;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 0.6s;
+    z-index: 1;
+    opacity: 0.60;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.6s;
 }
 #queue ul li:hover a img.thumbnail {
-	opacity: 0.75;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 0.6s;
+    opacity: 0.75;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.6s;
 }
 #queue ul li a img.play, #queue ul li img.delete {
-	z-index: 3;
-	position: absolute;
-	opacity: 0.0;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 0.6s;
+    z-index: 3;
+    position: absolute;
+    opacity: 0.0;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.6s;
 }
 #queue ul li a img.play {
-	top: 48px;
-	left: 125px;
+    top: 48px;
+    left: 125px;
 }
 #queue ul li img.delete {
     top: 12px;
@@ -78,37 +78,37 @@ body {
     height: 18px;
 }
 #queue ul li img.new {
-	z-index: 3;
-	position: absolute;
-	top: 12px;
-	left: 12px;
-	height: 12px;
-	width: 12px;
-	display: none;
+    z-index: 3;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    height: 12px;
+    width: 12px;
+    display: none;
 }
 #queue ul li.new img.new {
-	display: block;
+    display: block;
 }
 #queue ul li:hover a img.play, #queue ul li:hover img.delete {
-	opacity: 0.75;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 0.6s;
+    opacity: 0.75;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.6s;
 }
 
 #queue ul li a span {
-	z-index: 3;
-	color: white;
-	font-size: 18px;
-	text-shadow: 0px 1px 2px black;
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
-	padding: 4px 9px 9px 9px;
-	font-weight: 100;
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.7)));
+    z-index: 3;
+    color: white;
+    font-size: 18px;
+    text-shadow: 0px 1px 2px black;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    padding: 4px 9px 9px 9px;
+    font-weight: 100;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.7)));
 }
 #queue ul li a span b {
-	font-weight: 500;
+    font-weight: 500;
 }
 
 
@@ -121,100 +121,100 @@ body {
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-.btn {
-  display: inline-block;
-  *display: inline;
-  padding: 4px 12px;
-  margin-bottom: 0;
-  *margin-left: .3em;
-  font-size: 14px;
-  line-height: 20px;
-  *line-height: 20px;
-  color: #333333;
-  text-align: center;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-  vertical-align: middle;
-  cursor: pointer;
-  background-color: #f5f5f5;
-  *background-color: #e6e6e6;
-  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
-  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
-  background-repeat: repeat-x;
-  border: 1px solid #bbbbbb;
-  *border: 0;
-  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  border-bottom-color: #a2a2a2;
-  -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
-  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
-  *zoom: 1;
-  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-     -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-}
+    .btn {
+        display: inline-block;
+                 *display: inline;
+                 padding: 4px 12px;
+                 margin-bottom: 0;
+                 *margin-left: .3em;
+                 font-size: 14px;
+                 line-height: 20px;
+                 *line-height: 20px;
+                 color: #333333;
+                 text-align: center;
+                 text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+                 vertical-align: middle;
+                 cursor: pointer;
+                 background-color: #f5f5f5;
+                 *background-color: #e6e6e6;
+                 background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+                 background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+                 background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+                 background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+                 background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+                 background-repeat: repeat-x;
+                 border: 1px solid #bbbbbb;
+                         *border: 0;
+                         border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+                         border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+                         border-bottom-color: #a2a2a2;
+                         -webkit-border-radius: 4px;
+                         -moz-border-radius: 4px;
+                         border-radius: 4px;
+                         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+                         filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+                                 *zoom: 1;
+                                 -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+                                 -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+                                 box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+                             }
 
-.btn:hover,
-.btn:active,
-.btn.active,
-.btn.disabled,
-.btn[disabled] {
-  color: #333333;
-  background-color: #e6e6e6;
-  *background-color: #d9d9d9;
-}
+                             .btn:hover,
+                             .btn:active,
+                             .btn.active,
+                             .btn.disabled,
+                             .btn[disabled] {
+                                 color: #333333;
+                                 background-color: #e6e6e6;
+                                 *background-color: #d9d9d9;
+                             }
 
-.btn:active,
-.btn.active {
-  background-color: #cccccc \9;
-}
+                             .btn:active,
+                             .btn.active {
+                                 background-color: #cccccc \9;
+                             }
 
-.btn:first-child {
-  *margin-left: 0;
-}
+                             .btn:first-child {
+                                 *margin-left: 0;
+                             }
 
-.btn:hover {
-  color: #333333;
-  text-decoration: none;
-  background-color: #e6e6e6;
-  *background-color: #d9d9d9;
-  /* Buttons in IE7 don't get borders, so darken on hover */
+                             .btn:hover {
+                                 color: #333333;
+                                 text-decoration: none;
+                                 background-color: #e6e6e6;
+                                 *background-color: #d9d9d9;
+                                 /* Buttons in IE7 don't get borders, so darken on hover */
 
-  background-position: 0 -15px;
-  -webkit-transition: background-position 0.1s linear;
-     -moz-transition: background-position 0.1s linear;
-       -o-transition: background-position 0.1s linear;
-          transition: background-position 0.1s linear;
-}
+                                 background-position: 0 -15px;
+                                 -webkit-transition: background-position 0.1s linear;
+                                 -moz-transition: background-position 0.1s linear;
+                                 -o-transition: background-position 0.1s linear;
+                                 transition: background-position 0.1s linear;
+                             }
 
-.btn:focus {
-	outline:none;
-}
+                             .btn:focus {
+                                 outline:none;
+                             }
 
-.btn.active,
-.btn:active {
-  background-color: #e6e6e6;
-  background-color: #d9d9d9 \9;
-  background-image: none;
-  outline: 0;
-  -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-     -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-}
+                             .btn.active,
+                             .btn:active {
+                                 background-color: #e6e6e6;
+                                 background-color: #d9d9d9 \9;
+                                 background-image: none;
+                                 outline: 0;
+                                 -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+                                 -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+                                 box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+                             }
 
-.btn.disabled,
-.btn[disabled] {
-  cursor: default;
-  background-color: #e6e6e6;
-  background-image: none;
-  opacity: 0.65;
-  filter: alpha(opacity=65);
-  -webkit-box-shadow: none;
-     -moz-box-shadow: none;
-          box-shadow: none;
-}
+                             .btn.disabled,
+                             .btn[disabled] {
+                                 cursor: default;
+                                 background-color: #e6e6e6;
+                                 background-image: none;
+                                 opacity: 0.65;
+                                 filter: alpha(opacity=65);
+                                 -webkit-box-shadow: none;
+                                 -moz-box-shadow: none;
+                                 box-shadow: none;
+                             }
