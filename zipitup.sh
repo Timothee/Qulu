@@ -2,6 +2,6 @@
 cd src/
 rm ../Qulu.zip
 cp js/mixpanel.prod.js js/mixpanel.js
-zip -r ../Qulu.zip js/background.js css/font.css images/*.png manifest.json js/mixpanel.js html/popup.*
+zip -r ../Qulu.zip js/background.js js/popup.js js/mixpanel.js css/* images/*.png manifest.json html/*
 cp js/mixpanel.dev.js js/mixpanel.js
 cd -
