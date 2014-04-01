@@ -20,7 +20,9 @@
         "default_popup": "html/popup.html"
     },
     "permissions": [
-        "*://*.hulu.com/*"
+        "notifications",
+        "*://*.hulu.com/*",
+        "*://*.huluim.com/*"
         ],
-    "content_security_policy": "script-src 'self' https://cdn.mxpnl.com; object-src 'self'"
+    "content_security_policy": "img-src 'self' http://*.huluim.com; script-src 'self' https://cdn.mxpnl.com; object-src 'self'"
 }

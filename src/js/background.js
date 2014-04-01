@@ -2,7 +2,6 @@
 var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list&order=desc&sort=position";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
-var click_destination_url = QUEUE_URL;
 
 setInterval(checkQueue, 10000);
 
@@ -21,7 +20,8 @@ function checkQueue() {
 function deleteShow(showId) {
     chrome.browserAction.getBadgeText({}, function(string) {
         var count = parseInt(string) - 1;
-        chrome.browserAction.setBadgeText({text: (count ? count.toString() : "")})});
+        chrome.browserAction.setBadgeText({text: (count ? count.toString() : "")});
+    });
     var xhr = new XMLHttpRequest();
     xhr.open("POST", DELETE_URL + showId);
     xhr.onreadystatechange = function() {
@@ -33,20 +33,14 @@ function deleteShow(showId) {
 }
 
 function scrapePage(xhr) {
-    var doc = xhr.response, queue;
+    var doc = xhr.response;
+    var queue;
     // The XHR was redirected to the login page, thus we're logged out
     if (doc.title === "Hulu - Account") {
-        click_destination_url = LOGIN_URL;
-        localStorage["Qulu:loggedIn"] = false;
-        chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
-        chrome.browserAction.setBadgeText({text: "?"});
-        chrome.browserAction.setTitle({title: "You are not logged in."});
+        displayLogin();
     } else {
-        click_destination_url = QUEUE_URL;
         localStorage["Qulu:loggedIn"] = true;
         if (queue = doc.getElementById('queue')) {
-            console.log(queue);
-
             var previous_shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
             var show_ids = [];
             for (var i = 0; i < previous_shows.length; i++) {
@@ -59,6 +53,7 @@ function scrapePage(xhr) {
             var shows = queue.getElementsByClassName('r');
             var show, id, thumbnail_url, show_title, episode_title;
             var stored_shows = [];
+            var new_shows = [];
             var new_shows_number = 0;
 
             for (var i = 0; i < shows.length; i++) {
@@ -75,9 +70,14 @@ function scrapePage(xhr) {
                 var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
                 new_show.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
                 stored_shows.push(new_show);
+
+                if (new_show.seen === 'no') {
+                    new_shows.push(new_show);
+                }
             }
             localStorage["Qulu:shows"] = JSON.stringify(stored_shows);
 
+            // Display badge
             var number = (shows.length >= 25 ? "25+" : shows.length.toString());
             if (new_shows_number) {
                 chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 255]}); // green
@@ -86,16 +86,56 @@ function scrapePage(xhr) {
                 chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
                 chrome.browserAction.setBadgeText({text: number});
             }
-
             chrome.browserAction.setTitle({title: number + " video" + (number != 1 ? "s" : "") + " in your queue"});
             localStorage["Qulu:queueLength"] = number;
+
+            createNotifications(new_shows);
         } else {
-            chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
-            chrome.browserAction.setBadgeText({text: ""});
-            chrome.browserAction.setTitle({title: "Empty queue"});
-            localStorage["Qulu:queueLength"] = 0;
+            displayEmptyQueue();
         }
     }
+}
+
+function displayLogin() {
+    localStorage["Qulu:loggedIn"] = false;
+    chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
+    chrome.browserAction.setBadgeText({text: "?"});
+    chrome.browserAction.setTitle({title: "You are not logged in."});
+}
+
+function displayEmptyQueue() {
+    chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
+    chrome.browserAction.setBadgeText({text: ""});
+    chrome.browserAction.setTitle({title: "Empty queue"});
+    localStorage["Qulu:queueLength"] = 0;
+}
+
+function createNotifications(new_shows) {
+    chrome.notifications.getAll(function(existingNotifications) {
+        // Desktop notifications
+        for (var i = 0; i < new_shows.length; i++) {
+            var show = new_shows[i];
+
+            // Only create a notification if we haven't already
+            // (even if the show is still seen as 'new')
+            if ((show.id in existingNotifications) === false) {
+                var strippedTitle = stripHTML(show.title);
+                chrome.notifications.create(show.id, {
+                    type: 'image',
+                    iconUrl: 'images/logo_128x128.png',
+                    title: strippedTitle,
+                    message: 'New episode available',
+                    imageUrl: show.thumbnail_url
+                }, function(id) {});
+            }
+        }
+    });
+}
+
+function stripHTML(input) {
+    var div = document.createElement('div');
+    div.innerHTML = input;
+    return div.textContent || div.innerText || input;
 }
 
 chrome.extension.onMessage.addListener(
@@ -113,4 +153,5 @@ chrome.extension.onMessage.addListener(
         }
     }
 );
+
 checkQueue();
