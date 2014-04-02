@@ -30,12 +30,13 @@ window.onload = function () {
             var list = document.createElement('ul');
 
             for (var i = 0; i < shows.length; i++) {
+                var show = shows[i];
                 var new_item = document.createElement('li');
-                new_item.className = "show" + (shows[i]["seen"] == "yes" ? "" : " new");
-                new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + shows[i].id + "' target='_BLANK'>" +
-                    "<img class='thumbnail' src='" + shows[i]["thumbnail_url"] + "'/>" +
+                new_item.className = "show" + (show.seen == "yes" ? "" : " new");
+                new_item.innerHTML = "<a href='http://www.hulu.com/watch/" + show.id + "' target='_BLANK'>" +
+                    "<img class='thumbnail' src='" + show.thumbnail_url + "'/>" +
                     "<img class='play' src='../images/play.png'/>" +
-                    "<span>" + shows[i]["title"] + "</span>" +
+                    "<span>" + show.title + "</span>" +
                     "</a>" +
                     "<img class='delete' alt='Remove from queue' title='Remove from queue' src='../images/delete.png'/>" +
                     "<img class='new' alt='New video' title='New video' src='../images/pale_blue_dot.png'/>";
@@ -64,7 +65,7 @@ window.onload = function () {
                             }
                         }, 500);
                     });
-                })(shows[i], i);
+                })(show, i);
                 list.appendChild(new_item);
             }
             queue.innerHTML = "";

@@ -66,7 +66,7 @@ function scrapePage(xhr) {
                 } else {
                     new_show.seen = "yes";
                 }
-                new_show.thumbnail_url = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "290x160");
+                new_show.thumbnail_url = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "580x320");
                 var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
                 new_show.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
                 stored_shows.push(new_show);
@@ -120,6 +120,7 @@ function createNotifications(new_shows) {
             // (even if the show is still seen as 'new')
             if ((show.id in existingNotifications) === false) {
                 var strippedTitle = stripHTML(show.title);
+
                 chrome.notifications.create(show.id, {
                     type: 'image',
                     iconUrl: 'images/logo_128x128.png',
@@ -135,7 +136,7 @@ function createNotifications(new_shows) {
 function stripHTML(input) {
     var div = document.createElement('div');
     div.innerHTML = input;
-    return div.textContent || div.innerText || input;
+    return (div.textContent || div.innerText || input).trim();
 }
 
 chrome.extension.onMessage.addListener(
