@@ -119,18 +119,63 @@ function createNotifications(new_shows) {
             // Only create a notification if we haven't already
             // (even if the show is still seen as 'new')
             if ((show.id in existingNotifications) === false) {
-                var strippedTitle = stripHTML(show.title);
-
-                chrome.notifications.create(show.id, {
-                    type: 'image',
-                    iconUrl: 'images/logo_128x128.png',
-                    title: strippedTitle,
-                    message: 'New episode available',
-                    imageUrl: show.thumbnail_url
-                }, function(id) {});
+                getDataURL(show).then(function(show, dataURL) {
+                    var strippedTitle = stripHTML(show.title);
+                    chrome.notifications.create(show.id, {
+                        type: 'image',
+                        iconUrl: 'images/logo_128x128.png',
+                        title: strippedTitle,
+                        message: 'New episode available',
+                        imageUrl: dataURL
+                    }, function(id) {});
+                });
             }
         }
     });
+}
+
+/*
+ * Method that gets the data URL for an image URL
+ *
+ * Returns a Promise object that resolves with the passed show and the dataURL
+ * as the two arguments.
+ * The data URL returned will be 300x200
+ */
+function getDataURL(show) {
+    var deferred = $.Deferred();
+    var img = new Image();
+
+    img.onload = function () {
+        var posX, posY, croppedW, croppedH;
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+
+        if (this.width/this.height > 3/2) {
+            // It means the image is wider than the result we want
+            // Usually the case with Hulu images
+            canvas.height = 200; // 200 and not 240 (actual display size) because
+                                 // the image ends up empty if I use the full
+                                 // size. Maybe the canvas becomes too big?
+                                 // (unlikely, but no idea what's up)
+            canvas.width = canvas.height * 3 / 2;
+
+            croppedH = canvas.height;
+            croppedW = this.width * canvas.height/this.height;
+            posX = (canvas.width - this.width * canvas.height / this.height) / 2;
+            posY = 0;
+        } else {
+            // TODO: Should certainly fill that in...
+        }
+
+        ctx.drawImage(this, posX, posY, croppedW, croppedH);
+        var dataURL = canvas.toDataURL('image/png');
+
+        deferred.resolveWith(this, [show, dataURL]);
+    };
+
+    img.src = show.thumbnail_url;
+
+    return deferred.promise();
 }
 
 function stripHTML(input) {
