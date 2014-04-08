@@ -2,6 +2,7 @@
 var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list&order=desc&sort=position";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
+var WATCH_URL = 'http://www.hulu.com/watch/';
 
 setInterval(checkQueue, 10000);
 
@@ -199,5 +200,28 @@ chrome.extension.onMessage.addListener(
         }
     }
 );
+
+chrome.notifications.onClosed.addListener(function(id) {
+    mixpanel.track('close notification', {show_id: id});
+
+    // Mark show as seen so that the notification is not shown again
+    var shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
+    for (var i = 0; i < shows.length; i++) {
+        if (shows[i].id === id) {
+            shows[i]['seen'] = 'yes';
+            continue;
+        }
+    }
+    localStorage["Qulu:shows"] = JSON.stringify(shows);
+});
+
+chrome.notifications.onClicked.addListener(function(id) {
+    mixpanel.track('click notification', {show_id: id});
+
+    chrome.windows.create({
+        url: WATCH_URL + id,
+        type: 'normal'
+    });
+});
 
 checkQueue();
