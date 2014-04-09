@@ -4,7 +4,7 @@ var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
 var click_destination_url = QUEUE_URL;
 
-setInterval(checkQueue, 10000);
+//setInterval(checkQueue, 10000);
 
 function checkQueue() {
     var xhr = new XMLHttpRequest();
@@ -110,7 +110,43 @@ chrome.extension.onMessage.addListener(
             mixpanel.track("delete show");
             deleteShow(request.deleteShow);
 
+        } else if (request.removeWarning) {
+            if (localStorage['Qulu:warningSeen'] !== 'true') {
+                mixpanel.track('remove warning');
+                localStorage['Qulu:warningSeen'] = true;
+                clearInterval(badgeInterval);
+                checkQueue();
+                setInterval(checkQueue, 10000);
+            }
         }
     }
 );
-checkQueue();
+
+var badgeInterval;
+if (localStorage['Qulu:warningSeen'] !== "true") {
+    chrome.browserAction.setBadgeText({text: '!'});
+    var opacity = 1;
+    var direction = 'up';
+    var interval = 20;
+    badgeInterval = setInterval(function() {
+        if (direction === 'up') {
+            opacity += interval;
+        } else {
+            opacity -= interval;
+        }
+
+        if (opacity > 255) {
+            opacity = 255;
+            direction = 'down';
+        }
+        if (opacity < 1) {
+            opacity = 1;
+            direction = 'up';
+        }
+
+        chrome.browserAction.setBadgeBackgroundColor({color: [255, 0, 0, opacity]});
+    }, 100);
+} else {
+    checkQueue();
+    setInterval(checkQueue, 10000);
+}

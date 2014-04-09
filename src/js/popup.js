@@ -16,7 +16,13 @@ window.onload = function () {
     var empty_queue = document.getElementById("empty_queue");
     var queue = document.getElementById("queue");
 
-    if (localStorage["Qulu:loggedIn"] == "false") {
+    if (localStorage["Qulu:warningSeen"] !== "true") {
+        container.className = 'disabling-warning';
+        document.getElementById('showmemyshows').onclick = function() {
+            chrome.extension.sendMessage({removeWarning: true});
+            setTimeout(function() {window.location.reload();}, 2000);
+        }
+    } else if (localStorage["Qulu:loggedIn"] == "false") {
         container.className = "logged_out";
         queue.innerHTML = "You are not logged in";
         queue.className = "loggedout";
