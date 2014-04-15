@@ -1,3 +1,5 @@
 var mixpanel = {
-	track: function() {}
+    track: function() {
+        console.log(arguments);
+    }
 };

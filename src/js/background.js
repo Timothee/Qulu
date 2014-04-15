@@ -1,10 +1,17 @@
-
 var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list&order=desc&sort=position";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
-var click_destination_url = QUEUE_URL;
 
-setInterval(checkQueue, 10000);
+var existingQueue = new Queue();
+existingQueue.fetch();
+existingQueue.on('reset', updateBadge);
+
+var incomingQueue = new Queue();
+
+//setInterval(checkQueue, 10000);
+
+function updateBadge() {
+}
 
 function checkQueue() {
     var xhr = new XMLHttpRequest();
@@ -33,20 +40,16 @@ function deleteShow(showId) {
 }
 
 function scrapePage(xhr) {
-    var doc = xhr.response, queue;
+    var doc = xhr.response, queueEl;
     // The XHR was redirected to the login page, thus we're logged out
     if (doc.title === "Hulu - Account") {
-        click_destination_url = LOGIN_URL;
         localStorage["Qulu:loggedIn"] = false;
         chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
         chrome.browserAction.setBadgeText({text: "?"});
         chrome.browserAction.setTitle({title: "You are not logged in."});
     } else {
-        click_destination_url = QUEUE_URL;
         localStorage["Qulu:loggedIn"] = true;
-        if (queue = doc.getElementById('queue')) {
-            console.log(queue);
-
+        if (queueEl = doc.getElementById('queue')) {
             var previous_shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
             var show_ids = [];
             for (var i = 0; i < previous_shows.length; i++) {
@@ -56,10 +59,37 @@ function scrapePage(xhr) {
             }
 
             // parsing the shows and saving in localStorage
-            var shows = queue.getElementsByClassName('r');
+            var shows = queueEl.getElementsByClassName('r');
             var show, id, thumbnail_url, show_title, episode_title;
             var stored_shows = [];
             var new_shows_number = 0;
+
+            _.each(shows, function(show) {
+                var data = {};
+                data.showId = show.id.substring(7);
+                data.thumbnailUrl = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "290x160");
+                var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
+                data.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
+
+                incomingQueue.add(data);
+            });
+
+            // Make sure new shows are added and existing ones are updated
+            incomingQueue.each(function(episode) {
+                var existingEpisode = existingQueue.get(episode);
+                if (existingEpisode) {
+                    existingEpisode.save(episode.toJSON());
+                } else {
+                    existingQueue.create(episode.toJSON());
+                }
+            });
+
+            // Remove old shows
+            existingQueue.each(function(episode) {
+                if (!incomingQueue.get(episode)) {
+                    episode.destroy();
+                }
+            });
 
             for (var i = 0; i < shows.length; i++) {
                 var new_show = {};
@@ -88,12 +118,10 @@ function scrapePage(xhr) {
             }
 
             chrome.browserAction.setTitle({title: number + " video" + (number != 1 ? "s" : "") + " in your queue"});
-            localStorage["Qulu:queueLength"] = number;
         } else {
             chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
             chrome.browserAction.setBadgeText({text: ""});
             chrome.browserAction.setTitle({title: "Empty queue"});
-            localStorage["Qulu:queueLength"] = 0;
         }
     }
 }
