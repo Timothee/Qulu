@@ -1,10 +1,11 @@
 // resetting "seen" state on all the shows
 function resetSeenState(queue) {
+    queue.fetch();
     queue.each(function(episode) {
         episode.save({new: false});
     });
     chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
-    chrome.browserAction.setBadgeText({text: queue.length});
+    chrome.browserAction.setBadgeText({text: String(queue.length)});
 }
 
 window.onload = function () {
