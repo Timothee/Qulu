@@ -50,6 +50,7 @@ body {
     -webkit-transition: height 0.35s ease-out;
 }
 #queue ul li a img.thumbnail {
+    width: 290px;
     z-index: 1;
     opacity: 0.60;
     -webkit-transition-property: opacity;

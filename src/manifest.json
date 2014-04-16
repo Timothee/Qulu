@@ -1,6 +1,6 @@
 {
     "name": "Qulu – Your Hulu Queue",
-    "version": "0.4.5",
+    "version": "0.4.7",
     "manifest_version": 2,
 
     "description": "Access your Hulu queue right from the toolbar! A badge shows you if you have anything to watch right now.",
@@ -23,7 +23,9 @@
         "default_popup": "html/popup.html"
     },
     "permissions": [
-        "*://*.hulu.com/*"
+        "notifications",
+        "*://*.hulu.com/*",
+        "*://*.huluim.com/*"
         ],
-    "content_security_policy": "script-src 'self' https://cdn.mxpnl.com; object-src 'self'"
+    "content_security_policy": "img-src 'self' data: http://*.huluim.com; script-src 'self' https://cdn.mxpnl.com; object-src 'self'"
 }
