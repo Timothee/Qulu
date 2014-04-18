@@ -1,6 +1,6 @@
 {
     "name": "Qulu – Your Hulu Queue",
-    "version": "0.4.7",
+    "version": "0.4.7.3",
     "manifest_version": 2,
 
     "description": "Access your Hulu queue right from the toolbar! A badge shows you if you have anything to watch right now.",
@@ -24,6 +24,7 @@
     },
     "permissions": [
         "notifications",
+        "*://*.mixpanel.com/*",
         "*://*.hulu.com/*",
         "*://*.huluim.com/*"
         ],

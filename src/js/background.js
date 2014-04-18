@@ -158,7 +158,7 @@ function createNotifications(new_shows) {
                         type: 'image',
                         iconUrl: 'images/logo_128x128.png',
                         title: strippedTitle,
-                        message: 'New episode available',
+                        message: 'New episode available. Click to watch now!',
                         imageUrl: dataURL
                     }, function(id) {});
                 });
