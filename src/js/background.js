@@ -5,13 +5,68 @@ var WATCH_URL = 'http://www.hulu.com/watch/';
 
 var existingQueue = new Queue();
 existingQueue.fetch();
-existingQueue.on('reset', updateBadge);
 
-var incomingQueue = new Queue();
+setInterval(checkQueue, 10000);
+checkQueue();
 
-//setInterval(checkQueue, 10000);
 
+// Order of operations:
+// - poll to get queue page
+// - populate collection in localstorage
+// - update badge according to new state
+
+// Colors
+var colors = {
+    green: [125, 185, 65, 255],
+    gray: '#888',
+    red: ''
+};
+
+/*
+ * This function updates the badge based on the current state of the show
+ * collection and the login state.
+ * States to check:
+ * - logged in or not
+ * - empty queue?
+ * - any new shows?
+ * - total number of shows
+ */
 function updateBadge() {
+    existingQueue.fetch({silent: true});
+
+    if (Boolean(localStorage["Qulu:loggedIn"]) === false) {
+        displayLogin();
+        return;
+    }
+
+    if (existingQueue.length === 0) {
+        displayEmptyQueue();
+        return;
+    }
+
+    var newShows = existingQueue.where({fresh: true});
+    var queueLength = existingQueue.length >= 25 ? "25+" : String(existingQueue.length);
+
+    if (newShows.length) {
+        chrome.browserAction.setBadgeBackgroundColor({color: colors.green});
+        chrome.browserAction.setBadgeText({text: "+" + newShows.length});
+    } else {
+        chrome.browserAction.setBadgeBackgroundColor({color: colors.gray});
+        chrome.browserAction.setBadgeText({text: queueLength});
+    }
+    chrome.browserAction.setTitle({title: queueLength + " video" + (queueLength != 1 ? "s" : "") + " in your queue"});
+}
+
+function displayLogin() {
+    chrome.browserAction.setBadgeBackgroundColor({color: colors.gray});
+    chrome.browserAction.setBadgeText({text: "?"});
+    chrome.browserAction.setTitle({title: "You are not logged in."});
+}
+
+function displayEmptyQueue() {
+    chrome.browserAction.setBadgeBackgroundColor({color: colors.gray});
+    chrome.browserAction.setBadgeText({text: ""});
+    chrome.browserAction.setTitle({title: "Empty queue"});
 }
 
 function checkQueue() {
@@ -27,42 +82,35 @@ function checkQueue() {
 }
 
 function deleteShow(showId) {
-    chrome.browserAction.getBadgeText({}, function(string) {
-        var count = parseInt(string) - 1;
-        chrome.browserAction.setBadgeText({text: (count ? count.toString() : "")});
-    });
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", DELETE_URL + showId);
-    xhr.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
-            console.log("show " + showId + " deleted");
-        }
-    };
-    xhr.send();
+    existingQueue.fetch({silent: true});
+    var show = existingQueue.get(showId);
+
+    if (show) {
+        show.destroy();
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", DELETE_URL + showId);
+        xhr.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                console.log("show " + showId + " deleted");
+            }
+        };
+        xhr.send();
+    }
 }
 
 function scrapePage(xhr) {
-    var doc = xhr.response, queueEl;
+    var doc = xhr.response;
+    var queueEl = doc.getElementById('queue');
+
     // The XHR was redirected to the login page, thus we're logged out
     if (doc.title === "Hulu - Account") {
-        displayLogin();
+        localStorage["Qulu:loggedIn"] = false;
     } else {
         localStorage["Qulu:loggedIn"] = true;
-        if (queueEl = doc.getElementById('queue')) {
-            var previous_shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
-            var show_ids = [];
-            for (var i = 0; i < previous_shows.length; i++) {
-                if (previous_shows[i].seen === "yes") {
-                    show_ids.push(previous_shows[i].id);
-                }
-            }
-
+        if (queueEl) {
             // parsing the shows and saving in localStorage
             var shows = queueEl.getElementsByClassName('r');
-            var show, id, thumbnail_url, show_title, episode_title;
-            var stored_shows = [];
-            var new_shows = [];
-            var new_shows_number = 0;
+            var incomingQueue = new Queue();
 
             _.each(shows, function(show) {
                 var data = {};
@@ -80,7 +128,9 @@ function scrapePage(xhr) {
                 if (existingEpisode) {
                     existingEpisode.save(episode.toJSON());
                 } else {
-                    existingQueue.create(episode.toJSON());
+                    var data = episode.toJSON();
+                    data.fresh = true;
+                    existingQueue.create(data);
                 }
             });
 
@@ -91,69 +141,23 @@ function scrapePage(xhr) {
                 }
             });
 
-            for (var i = 0; i < shows.length; i++) {
-                var new_show = {};
-                show = shows[i];
-                new_show.id = show.id.substring(7);
-                if (show_ids.indexOf(new_show.id) === -1) {
-                    new_shows_number++;
-                    new_show.seen = "no";
-                } else {
-                    new_show.seen = "yes";
-                }
-                new_show.thumbnail_url = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "580x320");
-                var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
-                new_show.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
-                stored_shows.push(new_show);
-
-                if (new_show.seen === 'no') {
-                    new_shows.push(new_show);
-                }
-            }
-            localStorage["Qulu:shows"] = JSON.stringify(stored_shows);
-
-            // Display badge
-            var number = (shows.length >= 25 ? "25+" : shows.length.toString());
-            if (new_shows_number) {
-                chrome.browserAction.setBadgeBackgroundColor({color: [125, 185, 65, 255]}); // green
-                chrome.browserAction.setBadgeText({text: "+" + new_shows_number});
-            } else {
-                chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
-                chrome.browserAction.setBadgeText({text: number});
-            }
-            chrome.browserAction.setTitle({title: number + " video" + (number != 1 ? "s" : "") + " in your queue"});
-            createNotifications(new_shows);
+            createNotifications(existingQueue.where({fresh: true}));
         } else {
-            displayEmptyQueue();
+            existingQueue.reset();
         }
     }
+    updateBadge();
 }
 
-function displayLogin() {
-    localStorage["Qulu:loggedIn"] = false;
-    chrome.browserAction.setBadgeBackgroundColor({color: "#888"});
-    chrome.browserAction.setBadgeText({text: "?"});
-    chrome.browserAction.setTitle({title: "You are not logged in."});
-}
-
-function displayEmptyQueue() {
-    chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
-    chrome.browserAction.setBadgeText({text: ""});
-    chrome.browserAction.setTitle({title: "Empty queue"});
-    localStorage["Qulu:queueLength"] = 0;
-}
-
-function createNotifications(new_shows) {
+function createNotifications(newShows) {
     chrome.notifications.getAll(function(existingNotifications) {
         // Desktop notifications
-        for (var i = 0; i < new_shows.length; i++) {
-            var show = new_shows[i];
-
+        _.each(newShows, function(show) {
             // Only create a notification if we haven't already
-            // (even if the show is still seen as 'new')
+            // (even if the show is still seen as 'fresh')
             if ((show.id in existingNotifications) === false) {
                 getDataURL(show).then(function(show, dataURL) {
-                    var strippedTitle = stripHTML(show.title);
+                    var strippedTitle = stripHTML(show.get('title'));
                     chrome.notifications.create(show.id, {
                         type: 'image',
                         iconUrl: 'images/logo_128x128.png',
@@ -163,7 +167,7 @@ function createNotifications(new_shows) {
                     }, function(id) {});
                 });
             }
-        }
+        });
     });
 }
 
@@ -206,7 +210,7 @@ function getDataURL(show) {
         deferred.resolveWith(this, [show, dataURL]);
     };
 
-    img.src = show.thumbnail_url;
+    img.src = show.get('thumbnailUrl');
 
     return deferred.promise();
 }
@@ -229,6 +233,8 @@ chrome.extension.onMessage.addListener(
             mixpanel.track("delete show");
             deleteShow(request.deleteShow);
 
+        } else if (request.updateBadge) {
+            updateBadge();
         }
     }
 );
@@ -236,15 +242,12 @@ chrome.extension.onMessage.addListener(
 chrome.notifications.onClosed.addListener(function(id) {
     mixpanel.track('close notification', {show_id: id});
 
-    // Mark show as seen so that the notification is not shown again
-    var shows = (localStorage["Qulu:shows"] ? JSON.parse(localStorage["Qulu:shows"]) : []);
-    for (var i = 0; i < shows.length; i++) {
-        if (shows[i].id === id) {
-            shows[i]['seen'] = 'yes';
-            continue;
-        }
+    existingQueue.fetch();
+    var show = existingQueue.get(id);
+    if (show) {
+        show.save({fresh: false});
     }
-    localStorage["Qulu:shows"] = JSON.stringify(shows);
+    updateBadge();
 });
 
 chrome.notifications.onClicked.addListener(function(id) {
@@ -256,4 +259,3 @@ chrome.notifications.onClicked.addListener(function(id) {
     });
 });
 
-checkQueue();

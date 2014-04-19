@@ -2,10 +2,9 @@
 function resetSeenState(queue) {
     queue.fetch();
     queue.each(function(episode) {
-        episode.save({new: false});
+        episode.save({fresh: false});
     });
-    chrome.browserAction.setBadgeBackgroundColor({color: "#888"}); // gray
-    chrome.browserAction.setBadgeText({text: String(queue.length)});
+    chrome.extension.sendMessage({ updateBadge: true });
 }
 
 window.onload = function () {
@@ -22,13 +21,11 @@ window.onload = function () {
         queueContainer.className = "loggedout";
     } else {
         if (queue.length) {
-            var shows = JSON.parse(localStorage["Qulu:shows"]);
-
             container.className = "queue";
             var list = document.createElement('ul');
 
             queue.each(function(episode, index) {
-                var newEpisode = Boolean(episode.get('new'));
+                var newEpisode = Boolean(episode.get('fresh'));
                 var listItem = $('<li/>').addClass('show');
                 listItem.attr('id', episode.id);
                 if (newEpisode) {
@@ -51,7 +48,7 @@ window.onload = function () {
                         show_name: title,
                         queue_length: queue.length,
                         position: index,
-                        'new': newEpisode
+                        fresh: newEpisode
                     }});
                 });
 
