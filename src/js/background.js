@@ -257,5 +257,10 @@ chrome.notifications.onClicked.addListener(function(id) {
         url: WATCH_URL + id,
         type: 'normal'
     });
+    var show = existingQueue.get(id);
+    if (show) {
+        show.save({fresh: false});
+    }
+    updateBadge();
 });
 
