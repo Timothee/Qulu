@@ -136,7 +136,7 @@ function scrapePage(xhr) {
 
             // Remove old shows
             existingQueue.each(function(episode) {
-                if (!incomingQueue.get(episode)) {
+                if (!incomingQueue.get(episode.id)) {
                     episode.destroy();
                 }
             });
@@ -155,17 +155,18 @@ function createNotifications(newShows) {
         _.each(newShows, function(show) {
             // Only create a notification if we haven't already
             // (even if the show is still seen as 'fresh')
-            if ((show.id in existingNotifications) === false) {
-                getDataURL(show).then(function(show, dataURL) {
-                    var strippedTitle = stripHTML(show.get('title'));
-                    chrome.notifications.create(show.id, {
-                        type: 'image',
-                        iconUrl: 'images/logo_128x128.png',
-                        title: strippedTitle,
-                        message: 'New episode available. Click to watch now!',
-                        imageUrl: dataURL
-                    }, function(id) {});
-                });
+            if (true || (show.id in existingNotifications) === false) {
+                chrome.runtime.sendMessage({createNotifications: true, show: show});
+                //getDataURL(show).then(function(show, dataURL) {
+                //    var strippedTitle = stripHTML(show.get('title'));
+                //    chrome.notifications.create(show.id, {
+                //        type: 'image',
+                //        iconUrl: 'images/logo_128x128.png',
+                //        title: strippedTitle,
+                //        message: 'Click to watch now!',
+                //        imageUrl: dataURL
+                //    }, function(id) {});
+                //});
             }
         });
     });
@@ -183,6 +184,9 @@ function getDataURL(show) {
     var img = new Image();
 
     img.onload = function () {
+        if (this.complete === false) {
+            console.log('well, here\'s our problem');
+        }
         var posX, posY, croppedW, croppedH;
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
@@ -190,27 +194,31 @@ function getDataURL(show) {
         if (this.width/this.height > 3/2) {
             // It means the image is wider than the result we want
             // Usually the case with Hulu images
-            canvas.height = 200; // 200 and not 240 (actual display size) because
-                                 // the image ends up empty if I use the full
-                                 // size. Maybe the canvas becomes too big?
-                                 // (unlikely, but no idea what's up)
-            canvas.width = canvas.height * 3 / 2;
+            canvas.width = 360;
+            canvas.height = 240;
 
             croppedH = canvas.height;
             croppedW = this.width * canvas.height/this.height;
-            posX = (canvas.width - this.width * canvas.height / this.height) / 2;
+            posX = Math.floor((canvas.width - this.width * canvas.height / this.height) / 2);
             posY = 0;
         } else {
             // TODO: Should certainly fill that in...
         }
 
-        ctx.drawImage(this, posX, posY, croppedW, croppedH);
+        //ctx.drawImage(this, posX, posY, croppedW, croppedH);
+        ctx.fillStyle = "rgb(200,0,0)";
+        ctx.fillRect (10, 10, 55, 50);
         var dataURL = canvas.toDataURL('image/png');
 
-        deferred.resolveWith(this, [show, dataURL]);
+        console.log(dataURL);
+        console.log(show.thumbnailUrl);
+        setTimeout(function() {
+            deferred.resolveWith(this, [show, dataURL]);
+        }, 200);
     };
 
-    img.src = show.get('thumbnailUrl');
+    img.src = show.thumbnailUrl.replace('290x160', '435x240');
+    console.log(img.src);
 
     return deferred.promise();
 }
@@ -222,19 +230,33 @@ function stripHTML(input) {
 }
 
 chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
+    function(message, sender, sendResponse) {
         console.log('received message');
-        if (request.mixpanel) {
-            request.event_properties = request.event_properties || {};
-            console.log('sending event to Mixpanel:' + request.mixpanel, request.event_properties);
-            mixpanel.track(request.mixpanel, request.event_properties);
-        } else if (request.deleteShow) {
-            console.log("delete show " + request.deleteShow);
+        if (message.mixpanel) {
+            message.event_properties = message.event_properties || {};
+            console.log('sending event to Mixpanel:' + message.mixpanel, message.event_properties);
+            mixpanel.track(message.mixpanel, message.event_properties);
+        } else if (message.deleteShow) {
+            console.log("delete show " + message.deleteShow);
             mixpanel.track("delete show");
-            deleteShow(request.deleteShow);
+            deleteShow(message.deleteShow);
 
-        } else if (request.updateBadge) {
+        } else if (message.updateBadge) {
             updateBadge();
+        }
+        if (message.createNotifications) {
+            var show = message.show;
+
+            getDataURL(show).then(function(show, dataURL) {
+                var strippedTitle = stripHTML(show.title);
+                chrome.notifications.create(show.showId, {
+                    type: 'image',
+                    iconUrl: '../images/logo_128x128.png',
+                    title: strippedTitle,
+                    message: 'Click to watch now!',
+                    imageUrl: dataURL
+                }, function(id) {});
+            });
         }
     }
 );
