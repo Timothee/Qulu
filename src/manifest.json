@@ -14,6 +14,7 @@
                     "js/Episode.js", "js/Queue.js",
                     "js/mixpanel.js", "js/background.js"]
     },
+    "options_page": "html/options.html",
     "browser_action": {
         "default_title": "Qulu - Your Hulu Queue",
         "default_icon": {
