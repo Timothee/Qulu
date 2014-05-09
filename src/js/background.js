@@ -152,21 +152,35 @@ function scrapePage(xhr) {
 function createNotifications(newShows) {
     chrome.notifications.getAll(function(existingNotifications) {
         // Desktop notifications
-        _.each(newShows, function(show) {
-            // Only create a notification if we haven't already
-            // (even if the show is still seen as 'fresh')
-            if (true || (show.id in existingNotifications) === false) {
-                chrome.runtime.sendMessage({createNotifications: true, show: show});
-                //getDataURL(show).then(function(show, dataURL) {
-                //    var strippedTitle = stripHTML(show.get('title'));
-                //    chrome.notifications.create(show.id, {
-                //        type: 'image',
-                //        iconUrl: 'images/logo_128x128.png',
-                //        title: strippedTitle,
-                //        message: 'Click to watch now!',
-                //        imageUrl: dataURL
-                //    }, function(id) {});
-                //});
+        _.every(newShows, function(show) {
+            if ((show.id in existingNotifications) === false) {
+                var strippedTitle = stripHTML(show.get('title'));
+
+                if (show.get('thumbnailDataURL')) {
+                    chrome.notifications.create(show.id, {
+                        type: 'image',
+                        iconUrl: chrome.extension.getURL('../images/logo_128x128.png'),
+                        title: strippedTitle,
+                        message: 'Click to watch now!',
+                        imageUrl: show.get('thumbnailDataURL')
+                    }, function(id) {});
+                    return true;
+                } else {
+                    getDataURL(show).then(function(show, dataURL) {
+                        var strippedTitle = stripHTML(show.get('title'));
+                        existingQueue.get(show.id).save({thumbnailDataURL: dataURL});
+                        chrome.notifications.create(show.id, {
+                            type: 'image',
+                            iconUrl: '../images/logo_128x128.png',
+                            title: strippedTitle,
+                            message: 'Click to watch now!',
+                            imageUrl: show.get('thumbnailDataURL')
+                        }, function(id) {});
+                    });
+                    return false;
+                }
+            } else {
+                return true;
             }
         });
     });
@@ -205,19 +219,17 @@ function getDataURL(show) {
             // TODO: Should certainly fill that in...
         }
 
-        //ctx.drawImage(this, posX, posY, croppedW, croppedH);
-        ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect (10, 10, 55, 50);
+        ctx.drawImage(this, posX, posY, croppedW, croppedH);
+        //ctx.fillStyle = "rgb(200,0,0)";
+        //ctx.fillRect (10, 10, 55, 50);
         var dataURL = canvas.toDataURL('image/png');
 
         console.log(dataURL);
-        console.log(show.thumbnailUrl);
-        setTimeout(function() {
-            deferred.resolveWith(this, [show, dataURL]);
-        }, 200);
+        console.log(show.get('thumbnailUrl'));
+        deferred.resolveWith(this, [show, dataURL]);
     };
 
-    img.src = show.thumbnailUrl.replace('290x160', '435x240');
+    img.src = show.get('thumbnailUrl').replace('290x160', '435x240');
     console.log(img.src);
 
     return deferred.promise();
