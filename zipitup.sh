@@ -12,6 +12,7 @@ zip -r ../Qulu.zip\
     js/mixpanel.js\
     js/Episode.js\
     js/Queue.js\
+    js/options.js\
     css/*\
     images/*.png\
     manifest.json\

@@ -1,12 +1,82 @@
+// This is in minutes
+var POLL_DELAY = 15;
+
 var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list&order=desc&sort=position";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
 var WATCH_URL = 'http://www.hulu.com/watch/';
 
+chrome.notifications.onClosed.addListener(function(id) {
+    if (id !== 'notificationsQuestion') {
+        mixpanel.track('close notification', {show_id: id});
+
+        existingQueue.fetch();
+        var show = existingQueue.get(id);
+        if (show) {
+            show.save({fresh: false});
+        }
+        updateBadge();
+    } else {
+        chrome.notifications.clear(id, function() {});
+    }
+});
+
+chrome.notifications.onClicked.addListener(function(id) {
+    if (id !== 'notificationsQuestion') {
+        mixpanel.track('click notification', {show_id: id});
+
+        chrome.windows.create({
+            url: WATCH_URL + id,
+            type: 'normal'
+        });
+        var show = existingQueue.get(id);
+        if (show) {
+            show.save({fresh: false});
+        }
+        updateBadge();
+    } else {
+        chrome.notifications.clear(id, function() {});
+    }
+});
+
+chrome.notifications.onButtonClicked.addListener(function(notificationId, buttonIndex) {
+    if (notificationId === 'notificationsQuestion') {
+        if (buttonIndex === 0) {
+            mixpanel.track('notificationsQuestion', {choice: true});
+            localStorage['Qulu:options:notifications'] = true;
+            chrome.notifications.clear(notificationId, function() {});
+            createNotifications(existingQueue.where({fresh: true}));
+        } else {
+            mixpanel.track('notificationsQuestion', {choice: false});
+            localStorage['Qulu:options:notifications'] = false;
+            chrome.notifications.getAll(function(notifications) {
+                _.each(notifications, function(value, notification) {
+                    chrome.notifications.clear(notification, function() {});
+                });
+            });
+        }
+    }
+});
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.mixpanel) {
+            request.event_properties = request.event_properties || {};
+            mixpanel.track(request.mixpanel, request.event_properties);
+        } else if (request.deleteShow) {
+            mixpanel.track("delete show");
+            deleteShow(request.deleteShow);
+
+        } else if (request.updateBadge) {
+            updateBadge();
+        }
+    }
+);
+
 var existingQueue = new Queue();
 existingQueue.fetch();
 
-setInterval(checkQueue, 10000);
+setInterval(checkQueue, POLL_DELAY * 60 * 1000);
 checkQueue();
 
 
@@ -149,26 +219,43 @@ function scrapePage(xhr) {
     updateBadge();
 }
 
-function createNotifications(newShows) {
-    chrome.notifications.getAll(function(existingNotifications) {
-        // Desktop notifications
-        _.each(newShows, function(show) {
-            // Only create a notification if we haven't already
-            // (even if the show is still seen as 'fresh')
-            if ((show.id in existingNotifications) === false) {
-                getDataURL(show).then(function(show, dataURL) {
-                    var strippedTitle = stripHTML(show.get('title'));
-                    chrome.notifications.create(show.id, {
-                        type: 'image',
-                        iconUrl: 'images/logo_128x128.png',
-                        title: strippedTitle,
-                        message: 'New episode available. Click to watch now!',
-                        imageUrl: dataURL
-                    }, function(id) {});
-                });
-            }
+function createNotifications(shows) {
+    if (localStorage['Qulu:options:notifications'] === undefined) {
+        chrome.notifications.clear('notificationsQuestion', function() {
+            chrome.notifications.create('notificationsQuestion', {
+                type: 'basic',
+                title: 'Qulu, your Hulu Queue',
+                iconUrl: 'images/logo_128x128.png',
+                message: 'Do you want to get desktop notifications for new show arrivals?',
+                buttons: [
+                    { title: 'Yes'},
+                    { title: 'No' }
+                ]
+            }, function() {});
         });
-    });
+
+
+    } else if (localStorage['Qulu:options:notifications'] === 'true') {
+        chrome.notifications.getAll(function(existingNotifications) {
+            // Desktop notifications
+            _.each(shows, function(show) {
+                // Only create a notification if we haven't already
+                // (even if the show is still seen as 'fresh')
+                if ((show.id in existingNotifications) === false) {
+                    getDataURL(show).then(function(show, dataURL) {
+                        var strippedTitle = stripHTML(show.get('title'));
+                        chrome.notifications.create(show.id, {
+                            type: 'image',
+                            iconUrl: 'images/logo_128x128.png',
+                            title: strippedTitle,
+                            message: 'Click to watch now!',
+                            imageUrl: dataURL
+                        }, function(id) {});
+                    });
+                }
+            });
+        });
+    }
 }
 
 /*
@@ -220,47 +307,3 @@ function stripHTML(input) {
     div.innerHTML = input;
     return (div.textContent || div.innerText || input).trim();
 }
-
-chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        console.log('received message');
-        if (request.mixpanel) {
-            request.event_properties = request.event_properties || {};
-            console.log('sending event to Mixpanel:' + request.mixpanel, request.event_properties);
-            mixpanel.track(request.mixpanel, request.event_properties);
-        } else if (request.deleteShow) {
-            console.log("delete show " + request.deleteShow);
-            mixpanel.track("delete show");
-            deleteShow(request.deleteShow);
-
-        } else if (request.updateBadge) {
-            updateBadge();
-        }
-    }
-);
-
-chrome.notifications.onClosed.addListener(function(id) {
-    mixpanel.track('close notification', {show_id: id});
-
-    existingQueue.fetch();
-    var show = existingQueue.get(id);
-    if (show) {
-        show.save({fresh: false});
-    }
-    updateBadge();
-});
-
-chrome.notifications.onClicked.addListener(function(id) {
-    mixpanel.track('click notification', {show_id: id});
-
-    chrome.windows.create({
-        url: WATCH_URL + id,
-        type: 'normal'
-    });
-    var show = existingQueue.get(id);
-    if (show) {
-        show.save({fresh: false});
-    }
-    updateBadge();
-});
-
