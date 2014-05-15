@@ -226,7 +226,7 @@ function createNotifications(shows) {
                 type: 'basic',
                 title: 'Qulu, your Hulu Queue',
                 iconUrl: 'images/logo_128x128.png',
-                message: 'Do you want to get desktop notifications for new show arrivals?',
+                message: 'Do you want to get desktop notifications for new show arrivals?\n(you can change this on the Options page later)\n',
                 buttons: [
                     { title: 'Yes'},
                     { title: 'No' }
