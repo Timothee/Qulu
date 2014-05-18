@@ -66,6 +66,7 @@ chrome.extension.onMessage.addListener(
         } else if (request.deleteShow) {
             mixpanel.track("delete show");
             deleteShow(request.deleteShow);
+            updateBadge();
 
         } else if (request.updateBadge) {
             updateBadge();
