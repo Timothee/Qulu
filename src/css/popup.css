@@ -90,6 +90,24 @@ body {
 #queue ul li.new img.new {
     display: block;
 }
+
+span.expiring {
+    display: none;
+}
+
+.expiring span.expiring {
+    display: block;
+    background: red;
+    padding: 0px 3px;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    color: white;
+    font-size: 12px;
+    line-height: 18px;
+    text-transform: uppercase;
+}
+
 #queue ul li:hover a img.play, #queue ul li:hover img.delete {
     opacity: 0.75;
     -webkit-transition-property: opacity;

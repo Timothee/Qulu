@@ -25,10 +25,12 @@ window.onload = function () {
             var list = document.createElement('ul');
 
             queue.each(function(episode, index) {
-                var newEpisode = Boolean(episode.get('fresh'));
                 var listItem = $('<li/>').addClass('show');
                 listItem.attr('id', episode.id);
-                if (newEpisode) {
+
+                if (episode.isExpiringSoon()) {
+                    listItem.addClass('expiring');
+                } else if (episode.isFresh()) {
                     listItem.addClass('new');
                 }
 
@@ -38,7 +40,8 @@ window.onload = function () {
                     "<span>" + episode.get("title") + "</span>" +
                     "</a>" +
                     "<img class='delete' alt='Remove from queue' title='Remove from queue' src='../images/delete.png'/>" +
-                    "<img class='new' alt='New video' title='New video' src='../images/pale_blue_dot.png'/>");
+                    "<img class='new' alt='New video' title='New video' src='../images/pale_blue_dot.png'/>" +
+                    "<span class='expiring'>Expiring " + moment(episode.get('expirationDate')).from()+ "</span>");
 
                 listItem.find('a').click(function() {
                     var decomposedTitle = /<b>(.*)<\/b>/.exec(episode.title);
@@ -48,7 +51,7 @@ window.onload = function () {
                         show_name: title,
                         queue_length: queue.length,
                         position: index,
-                        fresh: newEpisode
+                        fresh: episode.isFresh()
                     }});
                 });
 

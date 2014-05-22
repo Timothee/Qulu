@@ -7,6 +7,7 @@ zip -r ../Qulu.zip\
     js/lib/underscore-min.js\
     js/lib/backbone-min.js\
     js/lib/backbone.localStorage.js\
+    js/lib/moment.min.js\
     js/background.js\
     js/popup.js\
     js/mixpanel.js\

@@ -1,5 +1,5 @@
 // This is in minutes
-var POLL_DELAY = 15;
+var POLL_DELAY_MINUTES = 15;
 
 var QUEUE_URL = "http://www.hulu.com/profile/queue?kind=thumbs&view=list&order=desc&sort=position";
 var LOGIN_URL = "https://secure.hulu.com/account/signin";
@@ -77,7 +77,7 @@ chrome.extension.onMessage.addListener(
 var existingQueue = new Queue();
 existingQueue.fetch();
 
-setInterval(checkQueue, POLL_DELAY * 60 * 1000);
+setInterval(checkQueue, POLL_DELAY_MINUTES * 60 * 1000);
 checkQueue();
 
 
@@ -90,7 +90,7 @@ checkQueue();
 var colors = {
     green: [125, 185, 65, 255],
     gray: '#888',
-    red: ''
+    red: '#f00'
 };
 
 /*
@@ -116,9 +116,15 @@ function updateBadge() {
     }
 
     var newShows = existingQueue.where({fresh: true});
+    var expiringShows = existingQueue.filter(function(show) {
+        return show.isExpiringSoon();
+    });
     var queueLength = existingQueue.length >= 25 ? "25+" : String(existingQueue.length);
 
-    if (newShows.length) {
+    if (expiringShows.length) {
+        chrome.browserAction.setBadgeBackgroundColor({color: colors.red});
+        chrome.browserAction.setBadgeText({text: String(expiringShows.length)});
+    } else if (newShows.length) {
         chrome.browserAction.setBadgeBackgroundColor({color: colors.green});
         chrome.browserAction.setBadgeText({text: "+" + newShows.length});
     } else {
@@ -189,6 +195,16 @@ function scrapePage(xhr) {
                 data.thumbnailUrl = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "290x160");
                 var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
                 data.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
+
+                data.airdate = (new Date($(show).find('.c5')[0].innerText)).getTime();
+                if (isNaN(data.airdate)) {
+                    data.airdate = (new Date(2010, 0)).getTime();
+                }
+
+                data.expirationDate = (new Date($(show).find('.c6')[0].innerText)).getTime();
+                if (isNaN(data.expirationDate)) {
+                    data.expirationDate = (new Date(2050, 0)).getTime();
+                }
 
                 incomingQueue.add(data);
             });

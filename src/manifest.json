@@ -1,6 +1,6 @@
 {
     "name": "Qulu – Your Hulu Queue",
-    "version": "0.5.3",
+    "version": "0.6.0",
     "manifest_version": 2,
 
     "description": "Access your Hulu queue right from the toolbar! A badge shows you if you have anything to watch right now.",
@@ -11,6 +11,7 @@
     "background": {
         "scripts": ["js/lib/jquery-2.1.0.min.js", "js/lib/underscore-min.js",
                     "js/lib/backbone-min.js", "js/lib/backbone.localStorage.js",
+                    "js/lib/moment.min.js",
                     "js/Episode.js", "js/Queue.js",
                     "js/mixpanel.js", "js/background.js"]
     },
