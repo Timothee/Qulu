@@ -41,7 +41,7 @@ window.onload = function () {
                     "</a>" +
                     "<img class='delete' alt='Remove from queue' title='Remove from queue' src='../images/delete.png'/>" +
                     "<img class='new' alt='New video' title='New video' src='../images/pale_blue_dot.png'/>" +
-                    "<span class='expiring'>Expiring " + moment(episode.get('expirationDate')).from()+ "</span>");
+                    "<span class='expiring'>Expires " + moment(episode.get('expirationDate')).endOf('day').from()+ "</span>");
 
                 listItem.find('a').click(function() {
                     var decomposedTitle = /<b>(.*)<\/b>/.exec(episode.title);

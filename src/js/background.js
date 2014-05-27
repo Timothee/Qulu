@@ -121,12 +121,12 @@ function updateBadge() {
     });
     var queueLength = existingQueue.length >= 25 ? "25+" : String(existingQueue.length);
 
-    if (expiringShows.length) {
-        chrome.browserAction.setBadgeBackgroundColor({color: colors.red});
-        chrome.browserAction.setBadgeText({text: String(expiringShows.length)});
-    } else if (newShows.length) {
+    if (newShows.length) {
         chrome.browserAction.setBadgeBackgroundColor({color: colors.green});
         chrome.browserAction.setBadgeText({text: "+" + newShows.length});
+    } else if (expiringShows.length) {
+        chrome.browserAction.setBadgeBackgroundColor({color: colors.red});
+        chrome.browserAction.setBadgeText({text: String(expiringShows.length)});
     } else {
         chrome.browserAction.setBadgeBackgroundColor({color: colors.gray});
         chrome.browserAction.setBadgeText({text: queueLength});

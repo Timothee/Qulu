@@ -1,6 +1,6 @@
 {
     "name": "Qulu – Your Hulu Queue",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "manifest_version": 2,
 
     "description": "Access your Hulu queue right from the toolbar! A badge shows you if you have anything to watch right now.",
