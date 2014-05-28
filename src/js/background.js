@@ -6,6 +6,19 @@ var LOGIN_URL = "https://secure.hulu.com/account/signin";
 var DELETE_URL = "http://www.hulu.com/users/remove_from_playlist/";
 var WATCH_URL = 'http://www.hulu.com/watch/';
 
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.alarms.create('checkQueue', {periodInMinutes: POLL_DELAY_MINUTES});
+    existingQueue.fetch();
+    checkQueue();
+});
+
+chrome.alarms.onAlarm.addListener(function(alarm) {
+    if (alarm.name === 'checkQueue') {
+        existingQueue.fetch();
+        checkQueue();
+    }
+});
+
 chrome.notifications.onClosed.addListener(function(id) {
     if (id !== 'notificationsQuestion') {
         mixpanel.track('close notification', {show_id: id});
@@ -76,10 +89,6 @@ chrome.extension.onMessage.addListener(
 
 var existingQueue = new Queue();
 existingQueue.fetch();
-
-setInterval(checkQueue, POLL_DELAY_MINUTES * 60 * 1000);
-checkQueue();
-
 
 // Order of operations:
 // - poll to get queue page
