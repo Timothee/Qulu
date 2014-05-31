@@ -21,7 +21,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 
 chrome.notifications.onClosed.addListener(function(id) {
     if (id !== 'notificationsQuestion') {
-        mixpanel.track('close notification', {show_id: id});
+        trackEvent('close notification', {show_id: id});
 
         existingQueue.fetch();
         var show = existingQueue.get(id);
@@ -36,7 +36,7 @@ chrome.notifications.onClosed.addListener(function(id) {
 
 chrome.notifications.onClicked.addListener(function(id) {
     if (id !== 'notificationsQuestion') {
-        mixpanel.track('click notification', {show_id: id});
+        trackEvent('click notification', {show_id: id});
 
         chrome.windows.create({
             url: WATCH_URL + id,
@@ -55,12 +55,12 @@ chrome.notifications.onClicked.addListener(function(id) {
 chrome.notifications.onButtonClicked.addListener(function(notificationId, buttonIndex) {
     if (notificationId === 'notificationsQuestion') {
         if (buttonIndex === 0) {
-            mixpanel.track('notificationsQuestion', {choice: true});
+            trackEvent('notificationsQuestion', {choice: true});
             localStorage['Qulu:options:notifications'] = true;
             chrome.notifications.clear(notificationId, function() {});
             createNotifications(existingQueue.where({fresh: true}));
         } else {
-            mixpanel.track('notificationsQuestion', {choice: false});
+            trackEvent('notificationsQuestion', {choice: false});
             localStorage['Qulu:options:notifications'] = false;
             chrome.notifications.getAll(function(notifications) {
                 _.each(notifications, function(value, notification) {
@@ -73,11 +73,11 @@ chrome.notifications.onButtonClicked.addListener(function(notificationId, button
 
 chrome.extension.onMessage.addListener(
     function(request, sender, sendResponse) {
-        if (request.mixpanel) {
-            request.event_properties = request.event_properties || {};
-            mixpanel.track(request.mixpanel, request.event_properties);
+        if (request.trackEvent) {
+            request.eventProperties = request.eventProperties || {};
+            trackEvent(request.trackEvent, request.eventProperties);
         } else if (request.deleteShow) {
-            mixpanel.track("delete show");
+            trackEvent("delete show");
             deleteShow(request.deleteShow);
             updateBadge();
 
@@ -281,6 +281,16 @@ function createNotifications(shows) {
                 }
             });
         });
+    }
+}
+
+function trackEvent(eventName, eventProperties) {
+    mixpanel.track(eventName, eventProperties);
+
+    if (localStorage[eventName]) {
+        localStorage[eventName]++;
+    } else {
+        localStorage[eventName] = 1;
     }
 }
 

@@ -46,7 +46,7 @@ window.onload = function () {
                 listItem.find('a').click(function() {
                     var decomposedTitle = /<b>(.*)<\/b>/.exec(episode.title);
                     var title = decomposedTitle ? decomposedTitle[1] : episode.title;
-                    chrome.extension.sendMessage({mixpanel: "click video", event_properties: {
+                    chrome.extension.sendMessage({trackEvent: "click video", eventProperties: {
                         show_id: episode.id,
                         show_name: title,
                         queue_length: queue.length,
@@ -77,4 +77,4 @@ window.onload = function () {
         }
     }
 };
-chrome.extension.sendMessage({mixpanel: "open popup"});
+chrome.extension.sendMessage({trackEvent: "open popup"});
