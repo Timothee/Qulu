@@ -80,12 +80,22 @@ chrome.extension.onMessage.addListener(
             trackEvent("delete show");
             deleteShow(request.deleteShow);
             updateBadge();
-
+        } else if (request.resetSeenState) {
+            resetSeenState();
+            updateBadge();
         } else if (request.updateBadge) {
             updateBadge();
         }
     }
 );
+
+// resetting "seen" state on all the shows
+function resetSeenState() {
+    existingQueue.fetch();
+    existingQueue.each(function(episode) {
+        episode.save({fresh: false});
+    });
+}
 
 var existingQueue = new Queue();
 existingQueue.fetch();
