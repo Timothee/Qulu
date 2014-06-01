@@ -287,10 +287,10 @@ function createNotifications(shows) {
 function trackEvent(eventName, eventProperties) {
     mixpanel.track(eventName, eventProperties);
 
-    if (localStorage[eventName]) {
-        localStorage[eventName]++;
+    if (localStorage['Qulu:event:' + eventName]) {
+        localStorage['Qulu:event:' + eventName]++;
     } else {
-        localStorage[eventName] = 1;
+        localStorage['Qulu:event:' + eventName] = 1;
     }
 }
 
