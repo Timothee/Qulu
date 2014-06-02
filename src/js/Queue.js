@@ -22,7 +22,7 @@
 
             // All above being equal, we want to put the most recent shows on top
             if (a.get('airdate') !== b.get('airdate')) {
-                return (a.get('airdate') > b.get('airdate')) ? -1 : 1;
+                return (a.get('airdate') < b.get('airdate')) ? -1 : 1;
             }
 
             // Finally if everything else is equal, we go by the title
