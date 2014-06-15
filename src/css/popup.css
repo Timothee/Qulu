@@ -131,6 +131,45 @@ span.expiring {
     font-weight: 500;
 }
 
+#queue .love-qulu-0 {
+    background: url('../images/love_qulu_bg_0.png') no-repeat;
+}
+
+#queue .love-qulu-1 {
+    background: url('../images/love_qulu_bg_1.png') no-repeat;
+}
+
+#queue .love-qulu-2 {
+    background: url('../images/love_qulu_bg_2.png') no-repeat;
+}
+
+#queue .love-qulu {
+    height: 56px;
+    background-size: cover;
+}
+
+.love-qulu a {
+    text-decoration: none;
+    font-size: 17px;
+    color: white;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    line-height: 56px;
+    height: 30px;
+    font-weight: 100;
+}
+.love-qulu a:after {
+    content: ' ';
+    display: inline-block;
+    background: url('../images/heart.png') no-repeat;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    top: 2px;
+    left: 3px;
+}
+
 
 /* Taken from Bootstrap */
 /* Copyright 2012 Twitter, Inc.

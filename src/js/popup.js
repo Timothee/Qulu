@@ -43,7 +43,6 @@ window.onload = function () {
                 });
 
                 listItem.find('.delete').click(function() {
-                    console.log("deleting show");
                     chrome.extension.sendMessage({deleteShow: episode.id});
                     listItem.addClass('deleted');
                     setTimeout(function() {
@@ -54,6 +53,12 @@ window.onload = function () {
                     }, 500);
                 });
                 $(list).append(listItem);
+
+                if (showReviewRequest(index)) {
+                    $(list).append('<li class="love-qulu love-qulu-' + (index % 3) + '" data-index="' + index + '">' +
+                            '<a href="https://chrome.google.com/webstore/detail/qulu-%E2%80%93-your-hulu-queue/iggfkakbafpkgjaocfjaoehcclhcjckb/reviews" target="_BLANK">Love Qulu? Click to leave a review!</a>' +
+                            '</li>');
+                }
             });
 
             queueContainer.innerHTML = "";
@@ -63,5 +68,20 @@ window.onload = function () {
             container.className = "empty_queue";
         }
     }
+    $('.love-qulu').click(loveQuluClick);
     chrome.extension.sendMessage({trackEvent: "open popup"});
 };
+
+function loveQuluClick(e) {
+    chrome.extension.sendMessage({trackEvent: "love qulu", eventProperties: {position: $(e.target).parent().data('index')}});
+}
+
+function showReviewRequest(index) {
+    // Shown if never clicked and you opened the popup at least 10 times
+    // After that, shown every three times you open the popup and
+    // one line every 7 episodes in the popup
+    return localStorage['Qulu:event:love qulu'] === undefined &&
+        localStorage['Qulu:event:open popup'] >= 10 &&
+        localStorage['Qulu:event:open popup']%3 === 0 &&
+        (index - 2) % 7 === 0;
+}
