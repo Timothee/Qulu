@@ -1,6 +1,6 @@
 {
     "name": "Qulu – Your Hulu Queue",
-    "version": "0.7.4",
+    "version": "0.7.5",
     "manifest_version": 2,
 
     "description": "Access your Hulu queue right from the toolbar! A badge shows you if you have anything to watch right now.",
@@ -26,7 +26,7 @@
     "browser_action": {
         "default_title": "Qulu - Your Hulu Queue",
         "default_icon": {
-            "19": "images/logo_gray_38x38.png",
+            "19": "images/logo_gray_19x19.png",
             "38": "images/logo_gray_38x38.png"
         },
         "default_popup": "html/popup.html"
