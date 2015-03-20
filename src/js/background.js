@@ -211,7 +211,7 @@ function scrapePage(xhr) {
             _.each(shows, function(show) {
                 var data = {};
                 data.showId = show.id.substring(7);
-                data.thumbnailUrl = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "290x160");
+                data.thumbnailUrl = show.getElementsByClassName('thumbnail')[0].src.replace("145x80", "580x320");
                 var title_divs = show.getElementsByClassName('c2')[0].getElementsByTagName('div')[1].children;
                 data.title = (title_divs[0].href === "http://www.hulu.com/plus?src=sticker" ? title_divs[0].innerHTML + " " + title_divs[1].innerHTML : title_divs[0].innerHTML);
 
@@ -323,10 +323,8 @@ function getDataURL(show) {
         if (this.width/this.height > 3/2) {
             // It means the image is wider than the result we want
             // Usually the case with Hulu images
-            canvas.height = 200; // 200 and not 240 (actual display size) because
-                                 // the image ends up empty if I use the full
-                                 // size. Maybe the canvas becomes too big?
-                                 // (unlikely, but no idea what's up)
+            canvas.height = 320; // NB: the actual display size is 240, but 320
+                                 // looks better on Retina screens.
             canvas.width = canvas.height * 3 / 2;
 
             croppedH = canvas.height;
